@@ -1,0 +1,9 @@
+{
+  "lastName": "test",
+  "firstName": "parse",
+  "realmRoles": ["doctor", "test"],
+  "credentials": [{
+    "type": "PASSWORD",
+    "value": "someValue"
+  }]
+}

@@ -1,0 +1,19 @@
+{
+  "url": "http://0.0.0.0:8080/auth",
+  "password": "$KEYCLOAK_PASSWORD",
+  "roles": [
+    "doctor",
+    "nurse"
+  ],
+  "users": [
+    {
+      "username": "test",
+      "realmRoles": [
+        "doctor",
+        "test"
+      ],
+      "password": "test"
+    }
+  ],
+  "registrationAllowed": true
+}
