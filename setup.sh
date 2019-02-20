@@ -2,7 +2,7 @@
  KEYCLOAK_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
  KEYCLOAK_USER="admin"
 echo "$KEYCLOAK_PASSWORD"
-envsubst < /opt/jboss/ditas/Keycloak.json > /opt/jboss/ditas/Keycloak.json
+envsubst < /opt/jboss/ditas/Keycloak.json.tmp > /opt/jboss/ditas/Keycloak.json
 ##################
 # Add admin user #
 ##################
@@ -145,7 +145,7 @@ fi
 ##################
 
 exec /opt/jboss/keycloak/bin/standalone.sh $SYS_PROPS $@ &
- 
-exec java -jar KeycloakAdminClient-1.0-SNAPSHOT.jar
+
+java -cp KeycloakAdminClient.jar KeycloakAdmin
 wait
 
