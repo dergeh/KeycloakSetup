@@ -1,6 +1,6 @@
 #!/bin/sh
- KEYCLOAK_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
- KEYCLOAK_USER="admin"
+export KEYCLOAK_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+KEYCLOAK_USER="admin"
 echo "$KEYCLOAK_PASSWORD"
 envsubst < /opt/jboss/ditas/Keycloak.json.tmp > /opt/jboss/ditas/Keycloak.json
 ##################

@@ -1,6 +1,7 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
 import model.KeyCloakModel;
 import model.UserModel;
+import org.jboss.logging.Logger;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.CredentialRepresentation;
@@ -9,10 +10,13 @@ import org.keycloak.representations.idm.UserRepresentation;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import static java.lang.Thread.sleep;
 
@@ -24,13 +28,14 @@ public class KeycloakAdmin {
 
 	private static String redirectUri = "http://localhost:9300";
 
+	private final static Logger logger = Logger.getLogger("KeycloakRESTAdmin");
+
 	public static void main(String... args) {
 
 		KeyCloakModel model = null;
 		ObjectMapper om = new ObjectMapper();
-		try {//TODO make relative path
-			model = om.readValue(new File(
-							"/opt/jboss/ditas/Keycloak.json"),
+		try {
+			model = om.readValue(new File("/opt/jboss/ditas/Keycloak.json"),
 					KeyCloakModel.class);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -51,6 +56,11 @@ public class KeycloakAdmin {
 		ClientRepresentation client = new ClientRepresentation();
 		client.setClientId(clientId);
 		client.setRedirectUris(Arrays.asList(redirectUri));
+		List<ClientRepresentation> clients = new LinkedList<>();
+		clients.add(client);
+
+		List<ClientRepresentation> clients1 = realm.getClients();
+		realm.setClients(clients);
 
 		kc.realms().create(realm);
 		for (UserModel user : model.getUsers()) {
@@ -60,28 +70,33 @@ public class KeycloakAdmin {
 	}
 
 	private static void waitForKeycloak(String url) {
-		int status=0;
-		/**try {while(status!=200) {
-			URL keycloak = new URL(url);
-			HttpURLConnection con =
-					(HttpURLConnection) keycloak.openConnection();
-			con.setRequestMethod("GET");
-			//con.connect();
-			status=con.getResponseCode();
-			sleep(1000);
-		}
+		int status = 0;
+		try {
+			while (status != 200) {
+				try {
+					URL keycloak = new URL(url);
+					HttpURLConnection con =
+							(HttpURLConnection) keycloak.openConnection();
+					con.setRequestMethod("GET");
+					con.connect();
+					status = con.getResponseCode();
+				} catch (ConnectException e) {
+					logger.debug("Connection refused trying again to reach Keycloak");
+					sleep(1000);
+				}
+			}
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}*/
-		try {
-			sleep(5000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		}/**
+		 try {
+		 sleep(10000);
+		 } catch (InterruptedException e) {
+		 e.printStackTrace();
+		 }*/
 	}
 
 	private static UserRepresentation parseUser(UserModel model) {
