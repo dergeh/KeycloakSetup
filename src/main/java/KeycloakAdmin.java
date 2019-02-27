@@ -14,9 +14,7 @@ import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static java.lang.Thread.sleep;
 
@@ -37,8 +35,7 @@ public class KeycloakAdmin {
 		ObjectMapper om = new ObjectMapper();
 		try {
 
-			model = om.readValue(config,
-					KeyCloakModel.class);
+			model = om.readValue(config, KeyCloakModel.class);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -59,11 +56,17 @@ public class KeycloakAdmin {
 		ClientRepresentation client = new ClientRepresentation();
 		client.setClientId(clientId);
 		client.setRedirectUris(Arrays.asList(redirectUri));
+		client.setEnabled(true);
+		client.setDirectAccessGrantsEnabled(true);
+		client.setImplicitFlowEnabled(true);
+		client.setWebOrigins(null);
+		client.setPublicClient(true);
 		List<ClientRepresentation> clients = new LinkedList<>();
 		clients.add(client);
 
-		List<ClientRepresentation> clients1 = realm.getClients();
 		realm.setClients(clients);
+		realm.setEnabled(true);
+
 
 		kc.realms().create(realm);
 		for (UserModel user : model.getUsers()) {
@@ -84,7 +87,8 @@ public class KeycloakAdmin {
 					con.connect();
 					status = con.getResponseCode();
 				} catch (ConnectException e) {
-					logger.debug("Connection refused trying again to reach Keycloak");
+					logger.debug(
+							"Connection refused trying again to reach Keycloak");
 					sleep(1000);
 				}
 			}
