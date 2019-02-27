@@ -146,6 +146,6 @@ fi
 
 exec /opt/jboss/keycloak/bin/standalone.sh $SYS_PROPS $@ &
 
-java -cp KeycloakAdminClient.jar KeycloakAdmin
+/opt/jboss/KeycloakAdminClient/bin/KeycloakAdminClient
 wait
 
