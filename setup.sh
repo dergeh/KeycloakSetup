@@ -143,7 +143,7 @@ fi
 ##################
 # Start Keycloak #
 ##################
-
+unset KEYCLOAK_PASSWORD
 exec /opt/jboss/keycloak/bin/standalone.sh $SYS_PROPS $@ &
 
 /opt/jboss/KeycloakAdminClient/bin/KeycloakAdminClient

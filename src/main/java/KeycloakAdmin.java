@@ -33,9 +33,11 @@ public class KeycloakAdmin {
 	public static void main(String... args) {
 
 		KeyCloakModel model = null;
+		File config = new File("/opt/jboss/ditas/Keycloak.json");
 		ObjectMapper om = new ObjectMapper();
 		try {
-			model = om.readValue(new File("/opt/jboss/ditas/Keycloak.json"),
+
+			model = om.readValue(config,
 					KeyCloakModel.class);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -43,6 +45,7 @@ public class KeycloakAdmin {
 		if (model == null) {
 			System.exit(-1);
 		}
+		config.delete();
 		waitForKeycloak(model.getUrl());
 		Keycloak kc = Keycloak.getInstance(model.getUrl(), "master", "admin",
 				model.getPassword(), "admin-cli");
