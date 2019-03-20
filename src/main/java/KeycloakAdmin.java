@@ -3,11 +3,12 @@ import model.KeyCloakModel;
 import model.UserModel;
 import org.jboss.logging.Logger;
 import org.keycloak.admin.client.Keycloak;
-import org.keycloak.representations.idm.ClientRepresentation;
-import org.keycloak.representations.idm.CredentialRepresentation;
-import org.keycloak.representations.idm.RealmRepresentation;
-import org.keycloak.representations.idm.UserRepresentation;
+import org.keycloak.admin.client.resource.RoleMappingResource;
+import org.keycloak.admin.client.resource.RoleScopeResource;
+import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.representations.idm.*;
 
+import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
 import java.net.ConnectException;
@@ -47,12 +48,7 @@ public class KeycloakAdmin {
 		Keycloak kc = Keycloak.getInstance(model.getUrl(), "master", "admin",
 				model.getPassword(), "admin-cli");
 
-		RealmRepresentation realm = new RealmRepresentation();
-		realm.setDefaultRoles(model.getRoles());
-		realm.setRealm(realmName);
-		realm.setRegistrationAllowed(model.isRegistrationAllowed());
-
-		//build a test client to optain tokens
+		//build a test client to get tokens
 		ClientRepresentation client = new ClientRepresentation();
 		client.setClientId(clientId);
 		client.setRedirectUris(Arrays.asList(redirectUri));
@@ -64,15 +60,47 @@ public class KeycloakAdmin {
 		List<ClientRepresentation> clients = new LinkedList<>();
 		clients.add(client);
 
+		//parse the roles for the realm
+		RolesRepresentation roles = new RolesRepresentation();
+		roles.setRealm(parseRoles(model.getRoles()));
+
+		//construct the realm
+		RealmRepresentation realm = new RealmRepresentation();
+		realm.setRoles(roles);
+		realm.setRealm(realmName);
+		realm.setRegistrationAllowed(model.isRegistrationAllowed());
 		realm.setClients(clients);
 		realm.setEnabled(true);
-
-
 		kc.realms().create(realm);
+
+		//add users to realm
 		for (UserModel user : model.getUsers()) {
-			kc.realm(realmName).users().create(parseUser(user));
+			UserRepresentation realmUser = parseUser(user);
+			Response response = kc.realm(realmName).users().create(realmUser);
+			//kc.realm(realmName).rolesById();
+			String userId = response.getLocation().getPath()
+					.replaceAll(".*/([^/]+)$", "$1");
+			logger.info("id: " + userId);
+			UserResource userResource = kc.realm(realmName).users().get(userId);
+			List<RoleRepresentation> realmRoles = new LinkedList<>();
+			for (String role : user.getRealmRoles()) {
+				realmRoles.add(kc.realm(realmName).roles().get(role)
+						.toRepresentation());
+
+			}
+			logger.info(realmRoles);
+			userResource.roles().realmLevel().add(realmRoles);
+
 		}
 
+	}
+
+	private static List<RoleRepresentation> parseRoles(List<String> roles) {
+		List<RoleRepresentation> retVal = new LinkedList<>();
+		for (String s : roles) {
+			retVal.add(new RoleRepresentation(s, s, false));
+		}
+		return retVal;
 	}
 
 	private static void waitForKeycloak(String url) {
@@ -117,6 +145,7 @@ public class KeycloakAdmin {
 		user.setUsername(model.getUsername());
 		user.setEnabled(true);
 		user.setCredentials(Arrays.asList(cred));
+		user.setRealmRoles(model.getRealmRoles());
 
 		return user;
 	}
