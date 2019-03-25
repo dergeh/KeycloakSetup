@@ -2,7 +2,7 @@ package eu.ditas.tub
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.ditas.tub.model.BlueprintConfig
-import eu.ditas.tub.model.KeyCloakModel
+import eu.ditas.tub.model.KeyCloakConfig
 import io.javalin.Context
 import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.*
@@ -62,7 +62,7 @@ class APIController (val port:Int,private val admin: IKeycloakAdmin){
 
         val credentials = admin.initizeRelam(config)
 
-        ctx.status(201).result(mapper.writeValueAsString(credentials))
+        ctx.status(201).result("<todo>")
 
         //TODO return service account credentials
     }
@@ -90,10 +90,10 @@ class APIController (val port:Int,private val admin: IKeycloakAdmin){
     }
 
     @Throws(Exception::class)
-    private fun getKeycloakConfigFrom(ctx:Context):KeyCloakModel{
+    private fun getKeycloakConfigFrom(ctx:Context): KeyCloakConfig {
         val body = ctx.body()
         val configData = Crypto.decrypt(keys.private, Base64.getDecoder().decode(body))
-        val config = mapper.readValue(configData, KeyCloakModel::class.java)
+        val config = mapper.readValue(configData, KeyCloakConfig::class.java)
         val id = ctx.pathParam("blueprintid")
         config.blueprintID = id
         return config

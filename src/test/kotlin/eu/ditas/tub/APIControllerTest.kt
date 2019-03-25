@@ -2,7 +2,7 @@ package eu.ditas.tub
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.ditas.tub.model.BlueprintConfig
-import eu.ditas.tub.model.KeyCloakModel
+import eu.ditas.tub.model.KeyCloakConfig
 import eu.ditas.tub.model.UserModel
 import io.javalin.Javalin
 import org.jboss.resteasy.util.Base64
@@ -15,7 +15,7 @@ class APIControllerTest {
             return object {}
         }
 
-        override fun applyConfig(config: KeyCloakModel?) {
+        override fun applyConfig(config: KeyCloakConfig?) {
 
         }
 
@@ -54,7 +54,7 @@ class APIControllerTest {
         var response = khttp.post("$url/v1/init", data = mapper.writeValueAsString(blue))
         Assert.assertTrue("blueprint created!",response.statusCode == 201)
 
-        val config = KeyCloakModel()
+        val config = KeyCloakConfig()
         config.roles.add("test")
         config.users.add(UserModel())
 

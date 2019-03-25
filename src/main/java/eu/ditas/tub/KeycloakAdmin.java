@@ -3,7 +3,7 @@ package eu.ditas.tub;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.ditas.tub.model.AdminConfig;
 import eu.ditas.tub.model.BlueprintConfig;
-import eu.ditas.tub.model.KeyCloakModel;
+import eu.ditas.tub.model.KeyCloakConfig;
 import eu.ditas.tub.model.UserModel;
 import org.jboss.logging.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +25,8 @@ import static java.lang.Thread.sleep;
 public class KeycloakAdmin implements IKeycloakAdmin {
 
     private final static Logger logger = Logger.getLogger(KeycloakAdmin.class.getName());
-    private static final String ADMIN_CONFIG_FILE = "/opt/jboss/ditas/Keycloak.json";
+    static String ADMIN_CONFIG_FILE = "/opt/jboss/ditas/Keycloak.json";
+    static boolean DELETE_ON_READ = true;
 
     private final Keycloak client;
 
@@ -52,21 +53,25 @@ public class KeycloakAdmin implements IKeycloakAdmin {
         clients.add(clientRepresentation);
 
 
+        RealmResource realmResource = client.realms().realm(config.getBlueprintID());
+        if (realmResource == null){
+            //construct the realm
+            RealmRepresentation realm = new RealmRepresentation();
+            realm.setRealm(config.getBlueprintID());
+            realm.setRegistrationAllowed(config.isRegistrationAllowed());
+            realm.setClients(clients);
+            realm.setEnabled(true);
 
-        //construct the realm
-        RealmRepresentation realm = new RealmRepresentation();
-        realm.setRealm(config.getBlueprintID());
-        realm.setRegistrationAllowed(config.isRegistrationAllowed());
-        realm.setClients(clients);
-        realm.setEnabled(true);
-        client.realms().create(realm);
+            client.realms().create(realm);
+        }
+
 
         //TODO: return service account credentials for relam
-        return null;
+        return new Object();
     }
 
     @Override
-    public void applyConfig(KeyCloakModel config) {
+    public void applyConfig(KeyCloakConfig config) {
         RealmResource resource = client.realms().realm(config.getBlueprintID());
 
         //parse the roles for the realm and add them
@@ -81,7 +86,10 @@ public class KeycloakAdmin implements IKeycloakAdmin {
         for (UserModel user : config.getUsers()) {
             UserRepresentation realmUser = parseUser(user);
             Response response = resource.users().create(realmUser);
-
+            if(response.getStatus() == 409){
+                //use already exsists - TODO: update instead ,skipping for now
+                continue;
+            }
             String userId = response.getLocation().getPath()
                     .replaceAll(".*/([^/]+)$", "$1");
             logger.info("id: " + userId);
@@ -118,7 +126,9 @@ public class KeycloakAdmin implements IKeycloakAdmin {
         if (model == null) {
             throw new Exception("Config is empty");
         }
-        config.delete();
+        if (DELETE_ON_READ) {
+            config.delete();
+        }
         return model;
     }
 

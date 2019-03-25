@@ -8,7 +8,7 @@ class SingingKeyTest {
     fun test(){
         val pair = Crypto.buildKeyPair()
 
-        val key = SingingKey(pair.public.algorithm,pair.public.encoded)
+        val key = SingingKey(pair.public.encoded)
 
         print("${key.crc} with ${key.algorithm}")
 

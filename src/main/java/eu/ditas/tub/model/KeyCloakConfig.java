@@ -3,14 +3,14 @@ package eu.ditas.tub.model;
 import java.util.LinkedList;
 import java.util.List;
 
-public class KeyCloakModel {
+public class KeyCloakConfig {
 
 	private String blueprintID;
 
 	private List<String> roles;
 	private List<UserModel>users;
 
-	public KeyCloakModel() {
+	public KeyCloakConfig() {
 		roles = new LinkedList<>();
 		users = new LinkedList<>();
 	}
