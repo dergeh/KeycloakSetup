@@ -1,0 +1,46 @@
+swagger: "2.0"
+info:
+  description: ""
+  version: "1.0.0"
+  title: "KeyCloak DITAS Configuraton Interface"
+  termsOfService: "http://swagger.io/terms/"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+basePath: "/v1"
+schemes:
+- "https"
+paths:
+  /keys:
+    get:
+      summary: "Gets the RSA Public Key as Base64 Bytes"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "string"
+            format: "byte"
+  /init:
+    post:
+      tags:
+        - "blueprint"
+      summary: "Initilize a Blueprint"
+      description: "initizlies a blueprint"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "service account credentials"
+        400:
+          description: "invalid status value"
+  /:id:
+    post:
+      tags:
+        - "blueprint"
+      summary: "Add users or roles to KeyCloak"
+      description: "modify blueprint"
+      responses:
+        200:
+          description: "service account credentials"
+        400:
+          description: "Invalid status value"
