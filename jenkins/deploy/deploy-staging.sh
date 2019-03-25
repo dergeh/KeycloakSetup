@@ -14,5 +14,5 @@ sudo docker pull ditas/keycloak:staging
 HOST_IP="$(ip route get 8.8.8.8 | awk '{print $NF; exit}')"
 
 # Run the docker mapping the ports and passing the host IP via the environmental variable "DOCKER_HOST_IP"
-sudo docker run -p 58000:443 -p 58080:8080 -e DOCKER_HOST_IP=$HOST_IP --restart unless-stopped -d --name keycloak ditas/keycloak:staging
+sudo docker run -p 58000:443 -p 58080:8443 -e DOCKER_HOST_IP=$HOST_IP --restart unless-stopped -d --name keycloak ditas/keycloak:staging
 ENDSSH
