@@ -148,7 +148,5 @@ unset KEYCLOAK_PASSWORD
 exec /opt/jboss/keycloak/bin/standalone.sh $SYS_PROPS $@ &
 
 /opt/jboss/KeycloakAdminClient/bin/KeycloakAdminClient &
-mkdir .certs
-mkdir .cert
 /go-acme-proxy --port 8000 --self
-
+wait
