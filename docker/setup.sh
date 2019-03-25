@@ -2,6 +2,7 @@
 export KEYCLOAK_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 KEYCLOAK_USER="admin"
 echo "$KEYCLOAK_PASSWORD"
+##generate local config file
 envsubst < /opt/jboss/ditas/Keycloak.json.tmp > /opt/jboss/ditas/Keycloak.json
 ##################
 # Add admin user #
@@ -146,6 +147,8 @@ fi
 unset KEYCLOAK_PASSWORD
 exec /opt/jboss/keycloak/bin/standalone.sh $SYS_PROPS $@ &
 
-/opt/jboss/KeycloakAdminClient/bin/KeycloakAdminClient
-wait
+/opt/jboss/KeycloakAdminClient/bin/KeycloakAdminClient &
+mkdir .certs
+mkdir .cert
+/go-acme-proxy --port 8000 --self
 

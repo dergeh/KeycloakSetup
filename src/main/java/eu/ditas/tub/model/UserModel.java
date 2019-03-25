@@ -1,4 +1,4 @@
-package model;
+package eu.ditas.tub.model;
 
 import java.util.List;
 

@@ -1,3 +1,9 @@
+FROM golang:1.12 as ssl
+WORKDIR /opt
+RUN git clone https://github.com/tawalaya/go-acme-proxy.git
+WORKDIR /opt/go-acme-proxy
+RUN CGO_ENABLED=0 go build -a --installsuffix cgo --ldflags="-w -s -X main.Build=$(git rev-parse --short HEAD)" -o go-acme-proxy
+
 FROM gradle:5.2-jdk8-alpine as build
 USER root
 COPY . .
@@ -12,14 +18,16 @@ ARG KEYCLOAK_ADMIN_PASWORD=password
 
 USER root
 RUN yum install -y gettext
+COPY --from=ssl --chown=jboss:jboss /opt/go-acme-proxy/go-acme-proxy /go-acme-proxy
+RUN setcap CAP_NET_BIND_SERVICE=+eip /go-acme-proxy
 USER jboss
-COPY --from=build /home/gradle/setup.sh /setup.sh
+COPY --from=build /home/gradle/docker/setup.sh /setup.sh
 COPY --from=build /home/gradle/build/distributions/KeycloakAdminClient.tar /tmp/KeycloakAdminClient.tar
 RUN tar -xvf /tmp/KeycloakAdminClient.tar 
-COPY --from=build --chown=jboss:jboss /home/gradle/Keycloak.json /opt/jboss/ditas/Keycloak.json.tmp
-##RUN /opt/jboss/keycloak/bin/add-user-keycloak.sh -u $KEYCLOAK_ADMIN_USER -p $KEYCLOAK_ADMIN_PASWORD
-#ADD $KEYCLOAK_IMPORT_REALM /opt/jboss/keycloak/
-#ADD master-realm.json /opt/jboss/keycloak
-ENTRYPOINT [ "/setup.sh" ]
+COPY --from=build --chown=jboss:jboss /home/gradle/docker/Keycloak.json /opt/jboss/ditas/Keycloak.json.tmp
 
+ENTRYPOINT [ "/setup.sh" ]
+EXPOSE 443
+#TODO: XXX should be removed in prod
+EXPOSE 8000
 CMD [ "-b", "0.0.0.0"]
