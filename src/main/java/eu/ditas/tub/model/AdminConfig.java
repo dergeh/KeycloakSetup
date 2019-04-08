@@ -19,4 +19,12 @@ public class AdminConfig {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    @Override
+    public String toString() {
+        return "AdminConfig{" +
+                "url='" + url + '\'' +
+                ", password='" + password + '\'' +
+                '}';
+    }
 }

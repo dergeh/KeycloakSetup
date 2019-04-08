@@ -129,6 +129,7 @@ public class KeycloakAdmin implements IKeycloakAdmin {
         if (DELETE_ON_READ) {
             config.delete();
         }
+        logger.infof("read keycloak config %s",model);
         return model;
     }
 
