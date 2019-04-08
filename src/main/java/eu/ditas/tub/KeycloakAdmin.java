@@ -53,8 +53,17 @@ public class KeycloakAdmin implements IKeycloakAdmin {
         clients.add(clientRepresentation);
 
 
-        RealmResource realmResource = client.realms().realm(config.getBlueprintID());
-        if (realmResource == null){
+        boolean realmExsists = false;
+        for (RealmRepresentation representation : client.realms().findAll()) {
+            if(representation.getRealm().matches(config.getBlueprintID())){
+                realmExsists = true;
+                break;
+            }
+        }
+
+
+
+        if (!realmExsists){
             //construct the realm
             RealmRepresentation realm = new RealmRepresentation();
             realm.setRealm(config.getBlueprintID());
@@ -65,8 +74,6 @@ public class KeycloakAdmin implements IKeycloakAdmin {
             client.realms().create(realm);
         }
 
-
-        //TODO: return service account credentials for relam
         return new Object();
     }
 

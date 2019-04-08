@@ -1,9 +1,9 @@
 #!/bin/sh
-if [$KEYCLOAK_PASSWORD == ""]; then
+if  [[ -z "${KEYCLOAK_PASSWORD}" ]]; then
 export KEYCLOAK_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 fi
 
-KEYCLOAK_USER   ="admin"
+KEYCLOAK_USER="admin"
 echo "$KEYCLOAK_PASSWORD"
 ##generate local config file
 envsubst < /opt/jboss/ditas/Keycloak.json.tmp > /opt/jboss/ditas/Keycloak.json

@@ -62,7 +62,7 @@ class APIController (val port:Int,private val admin: IKeycloakAdmin){
 
         val credentials = admin.initizeRelam(config)
 
-        ctx.status(201).result("<todo>")
+        ctx.status(201).result("todo:$credentials")
 
         //TODO return service account credentials
     }
