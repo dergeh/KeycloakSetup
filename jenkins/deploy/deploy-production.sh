@@ -15,7 +15,7 @@ sudo docker pull ditas/keycloak:production
 HOST_IP="$(ip route get 8.8.8.8 | awk '{print $NF; exit}')"
 
 # Run the docker mapping the ports and passing the host IP via the environmental variable "DOCKER_HOST_IP"
-sudo docker run -p 58080:8443 -p 58000:443 -v /opt/keycloak-db:/opt/jboss/keycloak/standalone/data -e DOCKER_HOST_IP=$HOST_IP --restart unless-stopped -d --name keycloak ditas/keycloak:production
+sudo docker run -p 58080:8443 -p 58000:443 -v /opt/keycloak-db:/opt/jboss/keycloak/standalone/data -e KEYCLOAK_PRODUCTION=1 -e DOCKER_HOST_IP=$HOST_IP -e KEYCLOAK_PASSWORD --restart unless-stopped -d --name keycloak ditas/keycloak:production
 ENDSSH
 
 # SSH to the OSR and deploy SDK component there
@@ -31,5 +31,5 @@ sudo docker pull ditas/keycloak:production
 HOST_IP="$(ip route get 8.8.8.8 | awk '{print $NF; exit}')"
 
 # Run the docker mapping the ports and passing the host IP via the environmental variable "DOCKER_HOST_IP"
-sudo docker run -p 58080:8443 -p 58000:443 -v /opt/keycloak-db:/opt/jboss/keycloak/standalone/data -e DOCKER_HOST_IP=$HOST_IP --restart unless-stopped -d --name keycloak ditas/keycloak:production
+sudo docker run -p 58080:8443 -p 58000:443 -v /opt/keycloak-db:/opt/jboss/keycloak/standalone/data -e KEYCLOAK_PRODUCTION=1 -e DOCKER_HOST_IP=$HOST_IP --restart unless-stopped -d --name keycloak ditas/keycloak:production
 ENDSSH
