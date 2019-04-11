@@ -47,7 +47,7 @@ public class KeycloakAdmin implements IKeycloakAdmin {
         clientRepresentation.setEnabled(true);
         clientRepresentation.setDirectAccessGrantsEnabled(true);
         clientRepresentation.setImplicitFlowEnabled(true);
-        clientRepresentation.setWebOrigins(null);
+        clientRepresentation.setWebOrigins(Collections.singletonList("*"););
         clientRepresentation.setPublicClient(true);
         List<ClientRepresentation> clients = new LinkedList<>();
         clients.add(clientRepresentation);
