@@ -3,7 +3,7 @@ package eu.ditas.tub.model;
 public class BlueprintConfig {
     private String blueprintID;
     private String ClientId = "vdc_client";
-    private String defaultRedirectUri = "http://localhost:9300";
+    private String defaultRedirectUri = "http://localhost:3000/";
 
     private boolean registrationAllowed;
 
