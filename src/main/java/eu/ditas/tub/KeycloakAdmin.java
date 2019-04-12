@@ -8,6 +8,7 @@ import eu.ditas.tub.model.UserModel;
 import org.jboss.logging.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.resource.ClientResource;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.*;
@@ -47,7 +48,7 @@ public class KeycloakAdmin implements IKeycloakAdmin {
         clientRepresentation.setEnabled(true);
         clientRepresentation.setDirectAccessGrantsEnabled(true);
         clientRepresentation.setImplicitFlowEnabled(true);
-        clientRepresentation.setWebOrigins(Collections.singletonList("*"););
+        clientRepresentation.setWebOrigins(Collections.singletonList("*"));
         clientRepresentation.setPublicClient(true);
         List<ClientRepresentation> clients = new LinkedList<>();
         clients.add(clientRepresentation);
@@ -82,12 +83,9 @@ public class KeycloakAdmin implements IKeycloakAdmin {
         RealmResource resource = client.realms().realm(config.getBlueprintID());
 
         //parse the roles for the realm and add them
-        RolesRepresentation roles = new RolesRepresentation();
-        roles.setRealm(createRoleRepresentation(config.getRoles()));
-        RealmRepresentation realm = new RealmRepresentation();
-        realm.setRoles(roles);
-        resource.update(realm);
-
+        for (String role : config.getRoles()) {
+            resource.roles().create(new RoleRepresentation(role,role,false));
+        }
 
         //add users to realm
         for (UserModel user : config.getUsers()) {
