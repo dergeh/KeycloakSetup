@@ -138,15 +138,6 @@ public class KeycloakAdmin implements IKeycloakAdmin {
         return model;
     }
 
-
-    private List<RoleRepresentation> createRoleRepresentation(List<String> roles) {
-        List<RoleRepresentation> retVal = new LinkedList<>();
-        for (String s : roles) {
-            retVal.add(new RoleRepresentation(s, s, false));
-        }
-        return retVal;
-    }
-
     private void waitForKeycloak(String url) {
         int status = 0;
         try {

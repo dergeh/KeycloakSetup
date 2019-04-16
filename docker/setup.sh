@@ -12,7 +12,13 @@ envsubst < /opt/jboss/ditas/Keycloak.json.tmp > /opt/jboss/ditas/Keycloak.json
 ##################
 
 if [ $KEYCLOAK_USER ] && [ $KEYCLOAK_PASSWORD ]; then
-    /opt/jboss/keycloak/bin/add-user-keycloak.sh --user $KEYCLOAK_USER --password $KEYCLOAK_PASSWORD
+    #check if we done this before
+    if [[ ! -f "/opt/jboss/keycloak/standalone/data/admin_user.lock" ]]; then
+        /opt/jboss/keycloak/bin/add-user-keycloak.sh --user $KEYCLOAK_USER --password $KEYCLOAK_PASSWORD
+        echo "lock" >> /opt/jboss/keycloak/standalone/data/admin_user.lock
+    else
+        echo "Master Password already set"
+    fi
 fi
 
 ############
